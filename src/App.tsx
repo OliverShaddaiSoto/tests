@@ -1,43 +1,67 @@
 import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const getUsers = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve([
+          { id: 1, name: 'Antonio', gender: 'male', status: 'active', salary: 1000 },
+          { id: 2, name: 'Rosa', gender: 'female', status: 'active', salary: 1000 },
+          { id: 3, name: 'Joseph', gender: 'male', status: 'inactive', salary: 2000 },
+          { id: 4, name: 'Lisa', gender: 'female', status: 'active', salary: 2000 },
+          { id: 5, name: 'Gwen', gender: 'female', status: 'inactive', salary: 3000 },
+          { id: 6, name: 'Antonio', gender: 'male', status: 'inactive', salary: 3000 }
+        ]);
+      }, 1000);
+    });
+  }
+
+  const getCompanies = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve([
+          { id: 1, name: 'Disney', employees: [1, 3], status: 'inactive' },
+          { id: 2, name: 'Nestle', employees: [4], status: 'active' },
+          { id: 3, name: 'Microsoft', employees: [2, 5, 6], status: 'active' }
+        ]);
+      }, 3000);
+    });
+  }
+
+
+  const mergeUsers = (users: any , companies: any) => {
+    return companies.map((company: any) => {
+      const employees = users.filter((user:any) => company.employees.includes(user.id));
+      return { ...company, employees };
+    });
+  };
+
+
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [users, setUsers] =  useState<any[]>([]);
+  (async () => {
+    const users = await getUsers();
+    const companies = await getCompanies();
+    const mergedData = mergeUsers(users, companies);
+    const arrayList: any[] = Object.values(mergedData);
+    console.log(arrayList);    
+    setCompanies(arrayList);
+  })();
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+      <table>
+        <tbody>
+          <tr>
+            { companies.map((v,k) => {
+              return(
+                <td key={k}> {v} </td>
+              )
+            }) }
+          </tr>
+        </tbody>
+      </table>
     </div>
   )
 }
