@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 
 function App() {
@@ -33,35 +33,64 @@ function App() {
   const mergeUsers = (users: any , companies: any) => {
     return companies.map((company: any) => {
       const employees = users.filter((user:any) => company.employees.includes(user.id));
+      
       return { ...company, employees };
     });
   };
 
+  const ableCompanies = (users: any , companies: any) => {
+    return companies.map((company: any) => {
+      const ableCompanies = companies.filter((company:any) => company.status.includes('inactive'));
+      return { ...company, ableCompanies };
+    });
+  }
+  
 
   const [companies, setCompanies] = useState<any[]>([]);
   const [users, setUsers] =  useState<any[]>([]);
+  
+
+useEffect( () => {
   (async () => {
     const users = await getUsers();
     const companies = await getCompanies();
     const mergedData = mergeUsers(users, companies);
-    const arrayList: any[] = Object.values(mergedData);
-    console.log(arrayList);    
+    const arrayList = Object.values(mergedData);
+    const abledCompanies = ableCompanies(users, companies)
+    const unableUsers = Object.values(abledCompanies);
+    console.log(unableUsers);
     setCompanies(arrayList);
-  })();
+  })()
+}, [])
+
+
+
+
 
   return (
     <div className="App">
-      <table>
-        <tbody>
-          <tr>
-            { companies.map((v,k) => {
-              return(
-                <td key={k}> {v} </td>
-              )
-            }) }
-          </tr>
-        </tbody>
-      </table>
+      <ul>
+        {
+          companies.map((companie, k) => {
+            return(
+              <li key={k}>
+                {companie.name}
+                <ol>
+                  {
+                    (companie.employees as any[]).map((employee, i) => {
+                      return(
+                        <li key={i}>
+                          {employee.name}
+                        </li>
+                      )
+                    })
+                  }
+                </ol>
+              </li>
+            )
+          })
+        }
+      </ul>
     </div>
   )
 }
