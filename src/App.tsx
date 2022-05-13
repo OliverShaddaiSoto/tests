@@ -38,11 +38,24 @@ function App() {
     });
   };
 
-  const ableCompanies = (users: any , companies: any) => {
-    return companies.map((company: any) => {
-      const ableCompanies = companies.filter((company:any) => company.status.includes('inactive'));
-      return { ...company, ableCompanies };
-    });
+  const ableCompanies = (companies: any) => {
+    const activeCompanies = new Array();
+    companies.map((company: any) => {
+      if (company.status === 'active') {
+        activeCompanies.push(company)
+      }
+    })
+    return activeCompanies;
+  }
+
+  const unableUsers = (users: any) => {
+    const inactiveUsers = new Array();
+    users.map((user: any) => {
+      if (user.status === 'inactive') {
+        inactiveUsers.push(user);
+      }
+    })
+    return inactiveUsers;
   }
   
 
@@ -56,10 +69,12 @@ useEffect( () => {
     const companies = await getCompanies();
     const mergedData = mergeUsers(users, companies);
     const arrayList = Object.values(mergedData);
-    const abledCompanies = ableCompanies(users, companies)
-    const unableUsers = Object.values(abledCompanies);
-    console.log(unableUsers);
+    const unabledCompanies = ableCompanies(companies);
+    const abledUsers = unableUsers(users);
+    const mergedData2 = mergeUsers(abledUsers, unabledCompanies);
+    const arrayList2 = Object.values(mergedData2);
     setCompanies(arrayList);
+    setUsers(arrayList2);
   })()
 }, [])
 
@@ -78,6 +93,30 @@ useEffect( () => {
                 <ol>
                   {
                     (companie.employees as any[]).map((employee, i) => {
+                      return(
+                        <li key={i}>
+                          {employee.name}
+                        </li>
+                      )
+                    })
+                  }
+                </ol>
+              </li>
+            )
+          })
+        }
+      </ul>
+      <br />
+      Usuarios inactivos en Empresas activas
+      <ul>
+        {
+          users.map((users, k) => {
+            return(
+              <li key={k}>
+                {users.name}
+                <ol>
+                  {
+                    (users.employees as any[]).map((employee, i) => {
                       return(
                         <li key={i}>
                           {employee.name}
