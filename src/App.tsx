@@ -59,8 +59,42 @@ function App() {
   }
   
 
+  const salaries = (mergedData: any[]) =>{
+    const arraySalarie = new Array();
+    var male: number = 0;
+    var female:number = 0;
+    for (let i = 0; i < mergedData.length; i++) {
+      arraySalarie.push( mergedData[i].name)
+      var employees = mergedData[i].employees;
+      for (let j = 0; j < employees.length;j++) {
+        if(employees[j].gender === 'male'){
+          male = male +employees[j].salary;
+        }else{
+          female = female +employees[j].salary;
+        }
+        
+      }
+      arraySalarie.push(male)
+      arraySalarie.push(female)
+      male = 0;
+      female = 0;
+    }
+    return arraySalarie;
+  }
+
+  const sortArray = (companies: any) => {
+    const sortedCompanies = new Array();
+    companies.map((company: any) => {
+      sortedCompanies.push(company.name)
+    })
+    
+    return sortedCompanies.sort();
+  }
+
   const [companies, setCompanies] = useState<any[]>([]);
   const [users, setUsers] =  useState<any[]>([]);
+  const [salary, setSalaries] = useState<any[]>([]);
+  const [sorted, setSort] = useState<any[]>([]);
   
 
 useEffect( () => {
@@ -73,8 +107,12 @@ useEffect( () => {
     const abledUsers = unableUsers(users);
     const mergedData2 = mergeUsers(abledUsers, unabledCompanies);
     const arrayList2 = Object.values(mergedData2);
+    const groupedSalaries= salaries(arrayList);
+    const sortedArray = sortArray(companies);
+    setSort(sortedArray);
     setCompanies(arrayList);
     setUsers(arrayList2);
+    setSalaries(groupedSalaries);
   })()
 }, [])
 
@@ -112,9 +150,7 @@ useEffect( () => {
         {
           users.map((users, k) => {
             return(
-              <li key={k}>
-                {users.name}
-                <ol>
+                <ol key={k}>
                   {
                     (users.employees as any[]).map((employee, i) => {
                       return(
@@ -125,11 +161,31 @@ useEffect( () => {
                     })
                   }
                 </ol>
-              </li>
             )
           })
         }
       </ul>
+      <br />
+      salario por Genero
+      <ul>
+        {salary.map((salaries, k) => {
+          return(
+            <li key={k}>
+              {salaries}
+            </li>
+          )
+        })}
+      </ul>
+
+
+      <br />
+      {sorted.map((sort, k) => {
+        return(
+          <li key={k}>
+            {sort}
+          </li>
+        )
+      })}
     </div>
   )
 }
